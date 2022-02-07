@@ -220,3 +220,8 @@ Stopping an instance can be done by killing the `openvpn` instance:
 kill 1495885
 ```
 
+Sample outout:
+```
+        Killing tinyproxy for dev tun1 with pid 1495945
+        Removing routes through XX.YY.ZZ.WW for tun1
+```
