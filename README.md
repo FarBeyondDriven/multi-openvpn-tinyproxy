@@ -204,7 +204,7 @@ Sample output:
 ```
 
 ## status
-As the script creates dat files with status message you can checkout your running instances at any time like this:
+As the script creates `.dat` files with status messages you can checkout your running instances at any time like this:
 ```
 cat /var/run/tinyproxy/tun*.dat
 ```
