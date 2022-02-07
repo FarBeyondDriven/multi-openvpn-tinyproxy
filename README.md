@@ -48,5 +48,23 @@ To allow the execution of these scripts the `openvpn` script security setting ha
 script-security 2
 ```
 
-### Note
-To allow automatic script execution you have to add
+## tinyproxy setup
+Several options in the `tinyproxy` configuration need to be adjusted based on the number of `openvpn` instances and the dynamic address of the vpn gateway. As these options change every time `openvpn` establishes a connection, we use a base template of your default `tinyproxy` configuration file:
+```
+cp /path/to/your/tinyproxy.conf /path/to/your/tinyproxy.conf.base
+```
+
+Edit your `tinyproxy.conf.base` like this:
+- change the `Port` option to look like this (uppercase letters!):
+```
+Port OVPNPORT
+```
+- change the `Bind` option to look like this (uppercase letters!):
+```
+Bind OVPNIP
+```
+- change the `PidFile` option to look like this (uppercase letters!):
+```
+PidFile "/var/run/tinyproxy/tinyproxy_OVPNDEV.pid"
+```
+*Note: You can adjust the location of your pid file, just make sure to include the string OVPNDEV in the path!*
