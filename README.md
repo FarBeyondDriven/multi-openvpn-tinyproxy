@@ -220,8 +220,48 @@ Stopping an instance can be done by killing the `openvpn` instance:
 kill 1495885
 ```
 
-Sample outout:
+Sample output:
 ```
         Killing tinyproxy for dev tun1 with pid 1495945
         Removing routes through XX.YY.ZZ.WW for tun1
+```
+
+## annex
+The `openvpn` instance can only be started and stopped by the `root` user. A reconnect (to get a new ip address) can be initiated by sending the `SIGUSR1` signal to the `openvpn` process - which is also limited to the `root` user. However it is possible for any user to send any signal to `openvpn` if it gets started with the management console:
+```
+/path/to/openvpn /path/to/your/config.ovpn --management 127.0.0.1 3333
+```
+
+Any user can then connect to the `openvpn` interface:
+```
+telnet 127.0.0.1
+```
+
+Sample output triggering a reconnect:
+```
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+>INFO:OpenVPN Management Interface Version 1 -- type 'help' for more info
+signal SIGUSR1
+SUCCESS: signal SIGUSR1 thrown
+        Killing tinyproxy for dev tun1 with pid 1498915
+        Removing routes through XX.YY.ZZ.WW for tun1
+
+        Connected through **VPNINFO** with public ip XX.YY.ZZ.WW
+        Starting tinyproxy with conf /etc/tinyproxy/tinyproxy_tun1.conf dev tun1 on port 8889 public ip XX.YY.ZZ.WW listening on port 8889
+        Tinyproxy for dev tun1 running with pid 1499037 for openvpn pid 1498859 listening on port 8889
+```
+
+Sample output shutting down openvpn:
+```
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+>INFO:OpenVPN Management Interface Version 1 -- type 'help' for more info
+signal SIGTERM
+SUCCESS: signal SIGTERM thrown
+        Killing tinyproxy for dev tun1 with pid 1499037
+        Removing routes through XX.YY.ZZ.WW for tun1
+Connection closed by foreign host.
 ```
