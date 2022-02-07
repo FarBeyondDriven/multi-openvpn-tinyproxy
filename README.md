@@ -196,10 +196,17 @@ To stop the process, press <kbd>ctrl-c</kbd>. Openvpn will kill the spawned tiny
 /path/to/openvpn /path/to/your/config.ovpn &
 ```
 
+Sample output:
+```
+        Connected through **CERTINFO** with public ip XX.YY.ZZ.WW
+        Starting tinyproxy with conf /etc/tinyproxy/tinyproxy_tun2.conf dev tun2 on port 8890 public ip XX.YY.ZZ.WW listening on port 8890
+        Tinyproxy for dev tun2 running with pid 1496464 for openvpn pid 1496413 listening on port 8890
+```
+
 ## status
 As the script creates dat files with status message you can checkout your running instances at any time like this:
 ```
-cat /var/run/tinyproxy/tun*.dat      
+cat /var/run/tinyproxy/tun*.dat
 ```
 
 Sample output:
