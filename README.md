@@ -92,7 +92,7 @@ The script will be executed by `openvpn` when the connection gets established an
 LOGID="vpnroutes-script"
 
 # your default gateway without any vpns, usually your router
-DEFGATEWAY="192.168.1.200"
+DEFGATEWAY="192.168.2.1"
 
 # customize above!
 
