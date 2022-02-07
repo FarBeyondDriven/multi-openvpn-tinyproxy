@@ -79,7 +79,7 @@ To create and refer to additional routing tables that have to be created for the
 15 vpn3
 16 vpn4
 ```
-*Note: Make sure that the number is unique in your file, the number itself does not matter as the scripts will refer to the tables by the name*
+*Note: Make sure that the number is unique in your file, the number itself does not matter as the scripts will refer to the tables by the name. The name and location of the file may vary depending on your operating system!*
 
 ## `vpnroutes` script
 The script will be executed by `openvpn` when the connection gets established and disconnected.
