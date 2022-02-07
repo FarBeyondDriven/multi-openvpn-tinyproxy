@@ -23,7 +23,7 @@ You should have already setup `openvpn` so you can successfully fire up a connec
 ```
 
 ### tinyproxy
-You should have already setup `tinyproxy` so you can successfully start up an instance. Only refering to `tinyproxy` here, but the setup cat easily be used and changed for any proxy you use.
+You should have already setup `tinyproxy` so you can successfully start up an instance. Only refering to `tinyproxy` here, but the setup can easily be used and changed for any proxy you use.
 
 ```
 /path/to/tinyproxy -c /path/to/your/tinyproxy.conf
