@@ -84,28 +84,102 @@ To create and refer to additional routing tables that have to be created for the
 ## `vpnroutes` script
 The script will be executed by `openvpn` when the connection gets established and disconnected.
 ```
-#!/bin/bash                                                                                                                                 
-                                                                                                                                            
-# customize here!                                                                                                                           
-                                                                                                                                            
-# the log id, useful if you want to grep for messages in the syslog                                                                         
-LOGID="vpnroutes-script"                                                                                                                    
-                                                                                                                                            
-# your default gateway without any vpns, usually your router                                                                                
-DEFGATEWAY="192.168.1.200"                                                                                                                  
-                                                                                                                                            
-# we have to manually create routing tables for the new openvpn interfaces                                                                  
-# those need to be known to the kernel in advance before we can use it                                                                      
-# for that edit the file /etc/iproute2/rt_tables                                                                                            
-# there add something like this at the end:                                                                                                 
-# 12 vpn0                                                                                                                                   
-# 13 vpn1                                                                                                                                   
-# 14 vpn2                                                                                                                                   
-# 15 vpn3                                                                                                                                   
-# 16 vpn4                                                                                                                                   
-# this will allow up to 5 additional routing tables, make sure the first number is unique in the file                                       
-# if you change the names here to something else than vpnX then you also have to change it in the routes below                              
-                                                                                                                                            
+#!/bin/bash
+
+# customize here!
+
+# the log id, useful if you want to grep for messages in the syslog
+LOGID="vpnroutes-script"
+
+# your default gateway without any vpns, usually your router
+DEFGATEWAY="192.168.1.200"
+
+# customize above!
+
 # log that this script has been run                                                                                                         
 /usr/bin/logger -i -t $LOGID called with type $script_type for interface $dev on $ifconfig_local
+
+case $script_type in
+up)
+        # run by openvpn when the interface was created
+        echo -e "\n\tConnected through "$common_name" with public ip "$trusted_ip
+
+        # get a unique number for the instance, simply using it from tunX or tapX
+        # we don't have to worry about it because openvpn will handle that for us
+        # ie takes one that is available                              
+        devnum=$(echo $dev | sed -e 's/[^0-9]//g')
+
+        # set a route to the vpn gateway through the default system gateway
+        # in case we already have a vpn running hogging the default route
+        # vpn hosters won't allow you to run a vpn through a vpn lol
+        /usr/sbin/route add $ifconfig_local gw $DEFGATEWAY
+
+        # connect the new network device with a dedicate routing table (must exist! see above!)
+        /sbin/ip route add $ifconfig_local/32 dev $dev src $ifconfig_local table vpn$devnum
+
+        # set a route in the global table that the vpn gateway is handled by the vpnX table
+        /sbin/ip route add default via $ifconfig_local dev $dev table vpn$devnum
+
+        # direct all traffic from the vpn gateway through the vpnX table 
+        /sbin/ip rule add from $ifconfig_local/32 table vpn$devnum
+        /sbin/ip rule add to $ifconfig_local/32 table vpn$devnum
+
+        # get a proxy port by adding an offset to the unique device number
+        # when adding 8888 then dev0 will be available on port 8888, dev1 will be port 8889 etc
+        proxyport=$(($devnum + 8888))
+               
+        # create a customized config file for tinyproxy using the base template
+        cat /path/to/your/tinyproxy.conf.base | sed -e "s/OVPNIP/$ifconfig_local/" -e "s/OVPNDEV/$dev/" -e "s/OVPNPORT/$proxyport/" > /path/to/your/tinyproxy_$dev.conf
+        echo -e "\tStarting tinyproxy with conf /path/to/your/tinyproxy_"$dev".conf dev "$dev" on port "$proxyport" public ip "$trusted_ip" listening on port "$proxyport
+ 
+        # start tinyproxy with that config file
+        /path/to/tinyproxy -c /path/to/your/tinyproxy_$dev.conf &
+        
+        # wait a short time until tinyproxy has spawned and setup its pid file
+        sleep 3
+        
+         # get the tinyproxy pid - just for the status output
+        TINYPID=$(grep -E "^[0-9]+$" /var/run/tinyproxy/tinyproxy_$dev.pid)
+        echo -e "\tTinyproxy for dev "$dev" running with pid "$TINYPID" for openvpn pid "$daemon_pid" listening on port "$proxyport
+        /usr/bin/logger -i -t $LOGID Starting tinyproxy for $dev on $ifconfig_local from tinyproxy_$dev.conf pubip $trusted_ip pid $TINYPID ovpnpid $daemon_pid proxyport $proxyport
+        
+        # create a dat file so we can always see which tinyproxy pid is running for which openvpn pid
+        echo -e $(date)" Tinyproxy for dev "$dev" running with pid "$TINYPID" for openvpn pid "$daemon_pid" listening on port "$proxyport" pubip "$trusted_ip > /var/run/tinyproxy/$dev.dat
+        
+        # for debugging, log all environment variables too
+        env > /var/run/tinyproxy/$dev.env
+
+down)
+        # run by openvpn when then interface gets removed
+
+        # get a unique number for the instance, simply using it from tunX or tapX
+        # we don't have to worry about it because openvpn will handle that for us
+        devnum=$(echo $dev | sed -e 's/[^0-9]//g')
+
+        # get the tinyproxy pid that has been spawned for this device and kill it
+        # this will also kill all child processes that tinypid spawned
+        TINYPID=$(grep -E "^[0-9]+$" /var/run/tinyproxy/tinyproxy_$dev.pid)
+        echo -e "\tKilling tinyproxy for dev "$dev" with pid "$TINYPID 
+        kill $TINYPID
+
+        /usr/bin/logger -i -t $LOGID Stopping tinyproxy for $dev with pid $TINYPID and removing routes for $dev
+
+        echo -e "\tRemoving routes through $ifconfig_local for $dev"
+
+        # remove routes that have been created
+        # routes in the vpnX tables get dropped automatically when the device vanishes
+        /usr/sbin/route del $ifconfig_local gw $DEFGATEWAY
+        /sbin/ip rule del from $ifconfig_local/32 table vpn$devnum
+        /sbin/ip rule del to $ifconfig_local/32 table vpn$devnum
+
+        # delete our status files
+        test -e /var/run/tinyproxy/$dev.dat && rm /var/run/tinyproxy/$dev.dat
+        test -e /var/run/tinyproxy/$dev.env && rm /var/run/tinyproxy/$dev.env
+
+        # optionally remove our custom tinyproxy config, if not deleted, it gets overwritten on the next run
+        test -e /etc/tinyproxy/tinyproxy_$dev.conf && rm /etc/tinyproxy/tinyproxy_$dev.conf
+        ;;
+esac
+
+exit 0
 ```
