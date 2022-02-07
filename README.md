@@ -42,8 +42,9 @@ To automatically start `tinyproxy` when `openvpn` establishes a connection we us
 up /path/to/vpnroutes
 down /path/to/vpnroutes
 ```
+*Note: you can change the location and the name of the script to your liking*
 
-To allow the execution of these scripts the `openvpn` script security setting has to be adjusted accordingly:
+To allow the execution of the script `vpnroutes` the `openvpn` script security setting has to be adjusted accordingly:
 ```
 script-security 2
 ```
@@ -68,3 +69,43 @@ Bind OVPNIP
 PidFile "/var/run/tinyproxy/tinyproxy_OVPNDEV.pid"
 ```
 *Note: You can adjust the location of your pid file, just make sure to include the string OVPNDEV in the path!*
+
+## routing tables
+To create and refer to additional routing tables that have to be created for the `openvpn` network interfaces one can add additional entries to the `/etc/iproute2/rt_tables` file. There can be up to 255 routing tables, each one refered to by number or name. For easy access and scripting add a few more to the end of your `/etc/iproute2/rt_tables`.
+```
+12 vpn0
+13 vpn1
+14 vpn2
+15 vpn3
+16 vpn4
+```
+*Note: Make sure that the number is unique in your file, the number itself does not matter as the scripts will refer to the tables by the name*
+
+## `vpnroutes` script
+The script will be executed by `openvpn` when the connection gets established and disconnected.
+```
+#!/bin/bash                                                                                                                                 
+                                                                                                                                            
+# customize here!                                                                                                                           
+                                                                                                                                            
+# the log id, useful if you want to grep for messages in the syslog                                                                         
+LOGID="vpnroutes-script"                                                                                                                    
+                                                                                                                                            
+# your default gateway without any vpns, usually your router                                                                                
+DEFGATEWAY="192.168.1.200"                                                                                                                  
+                                                                                                                                            
+# we have to manually create routing tables for the new openvpn interfaces                                                                  
+# those need to be known to the kernel in advance before we can use it                                                                      
+# for that edit the file /etc/iproute2/rt_tables                                                                                            
+# there add something like this at the end:                                                                                                 
+# 12 vpn0                                                                                                                                   
+# 13 vpn1                                                                                                                                   
+# 14 vpn2                                                                                                                                   
+# 15 vpn3                                                                                                                                   
+# 16 vpn4                                                                                                                                   
+# this will allow up to 5 additional routing tables, make sure the first number is unique in the file                                       
+# if you change the names here to something else than vpnX then you also have to change it in the routes below                              
+                                                                                                                                            
+# log that this script has been run                                                                                                         
+/usr/bin/logger -i -t $LOGID called with type $script_type for interface $dev on $ifconfig_local
+```
