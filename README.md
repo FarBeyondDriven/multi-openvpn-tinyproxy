@@ -198,7 +198,7 @@ To stop the process, press <kbd>ctrl-c</kbd>. Openvpn will kill the spawned tiny
 
 Sample output:
 ```
-        Connected through **CERTINFO** with public ip XX.YY.ZZ.WW
+        Connected through **VPNINFO** with public ip XX.YY.ZZ.WW
         Starting tinyproxy with conf /etc/tinyproxy/tinyproxy_tun2.conf dev tun2 on port 8890 public ip XX.YY.ZZ.WW listening on port 8890
         Tinyproxy for dev tun2 running with pid 1496464 for openvpn pid 1496413 listening on port 8890
 ```
