@@ -148,7 +148,7 @@ up)
         
         # for debugging, log all environment variables too
         env > /var/run/tinyproxy/$dev.env
-
+        ;;
 down)
         # run by openvpn when then interface gets removed
 
@@ -183,3 +183,33 @@ esac
 
 exit 0
 ```
+
+## usage
+- With this config in place you can simply start openvpn in the foreground like this:
+```
+/path/to/openvpn /path/to/your/config.ovpn
+```
+To stop the process, press <kbd>ctrl-c</kbd>. Openvpn will kill the spawned tinyproxy instance.
+
+- or in the background like this:
+```
+/path/to/openvpn /path/to/your/config.ovpn &
+```
+
+## status
+As the script creates dat files with status message you can checkout your running instances at any time like this:
+```
+cat /var/run/tinyproxy/tun*.dat      
+```
+
+Sample output:
+```
+Tue Feb 8 00:14:15 CET 2022 Tinyproxy for dev tun1 running with pid 1495945 for openvpn pid 1495885 listening on port 8889 pubip XX.YY.ZZ.WW
+Tue Feb 8 00:18:42 CET 2022 Tinyproxy for dev tun2 running with pid 1496464 for openvpn pid 1496413 listening on port 8890 pubip XX.ZZ.WW.YY
+```
+
+Stopping an instance can be done by killing the `openvpn` instance:
+```
+kill 1495885
+```
+
