@@ -228,7 +228,7 @@ Sample output:
         Removing routes through XX.YY.ZZ.WW for tun1
 ```
 
-## annex
+## appendix
 The `openvpn` instance can only be started and stopped by the `root` user. A reconnect (to get a new ip address) can be initiated by sending the `SIGUSR1` signal to the `openvpn` process - which is also limited to the `root` user. However it is possible for any user to send any signal to `openvpn` if it gets started with the management console:
 ```
 /path/to/openvpn /path/to/your/config.ovpn --management 127.0.0.1 3333
@@ -268,4 +268,4 @@ SUCCESS: signal SIGTERM thrown
 Connection closed by foreign host.
 ```
 
-*Note: These signals can be sent by simple scripts to automate a reconnect or shutdown of openvpn.*
+*Note: These signals can be sent by simple scripts to automate a reconnect or shutdown of openvpn. The output of the `vpnroutes` script may not be shown when you started `openvpn` on a different console. You can still see the messages in your syslog.*
