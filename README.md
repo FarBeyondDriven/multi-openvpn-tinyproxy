@@ -265,3 +265,5 @@ SUCCESS: signal SIGTERM thrown
         Removing routes through XX.YY.ZZ.WW for tun1
 Connection closed by foreign host.
 ```
+
+*Note: These signals can be sent by simple scripts to automate a reconnect or shutdown of openvpn.*
