@@ -234,7 +234,7 @@ The `openvpn` instance can only be started and stopped by the `root` user. A rec
 
 Any user can then connect to the `openvpn` interface:
 ```
-telnet 127.0.0.1:3333
+telnet 127.0.0.1 3333
 ```
 
 Sample output triggering a reconnect:
