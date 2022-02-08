@@ -269,3 +269,6 @@ Connection closed by foreign host.
 ```
 
 *Note: These signals can be sent by simple scripts to automate a reconnect or shutdown of openvpn. The output of the `vpnroutes` script may not be shown when you started `openvpn` on a different console. You can still see the messages in your syslog.*
+
+## Additional status information
+Once the `openvpn` instance is running, you can see all available environment variables that can be used in the `vpnroutes` script in the `/var/run/tinyproxy/$dev.env` file. By default this file will be removed when the connection is dropped.
