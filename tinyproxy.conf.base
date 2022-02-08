@@ -2,7 +2,7 @@
 # tinyproxy TEMPLATE file
 #
 
-# properly running an nobody
+# properly running as nobody
 User nobody
 Group nogroup
 
