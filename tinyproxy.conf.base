@@ -1,0 +1,44 @@
+# properly running an nobody
+User nobody
+Group nogroup
+
+#
+# tinyproxy TEMPLATE file
+#
+
+# setup the interfaces the proxy will listen on
+Listen 127.0.0.1
+
+# options that will be replaced when this template gets used
+Port OVPNPORT
+Bind OVPNIP
+PidFile "/var/run/tinyproxy/tinyproxy_OVPNDEV.pid"
+
+# standard options
+Timeout 600
+DefaultErrorFile "/usr/share/tinyproxy/default.html"
+StatFile "/usr/share/tinyproxy/stats.html"
+Syslog On
+LogLevel Warning
+
+# adjust to your needs
+MaxClients 10
+MinSpareServers 2
+MaxSpareServers 5
+StartServers 2
+
+# obsolete option in more recent versions of tinyproxy
+MaxRequestsPerChild 0
+
+# allow ips to access this proxy
+Allow 127.0.0.1
+
+# should not show up but localhost is always a good name
+ViaProxyName "localhost"
+DisableViaHeader Yes
+
+# ports you want to connect to with this proxy
+# if you get an error about forbidden port, add another line for it here
+ConnectPort 443
+ConnectPort 563
+ConnectPort 8080
