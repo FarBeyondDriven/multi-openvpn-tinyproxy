@@ -1,10 +1,10 @@
-# properly running an nobody
-User nobody
-Group nogroup
-
 #
 # tinyproxy TEMPLATE file
 #
+
+# properly running an nobody
+User nobody
+Group nogroup
 
 # setup the interfaces the proxy will listen on
 Listen 127.0.0.1
