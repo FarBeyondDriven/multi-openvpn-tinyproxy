@@ -15,6 +15,8 @@ Some only allow five, others up to ten. Using this setup may violate their TOU!*
 
 ## Preparation
 
+*Example files have been added to this repo*
+
 ### openvpn
 You should have already setup `openvpn` so you can successfully fire up a connection from the command line.
 
