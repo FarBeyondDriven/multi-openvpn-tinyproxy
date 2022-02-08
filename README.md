@@ -116,7 +116,7 @@ up)
         # vpn hosters won't allow you to run a vpn through a vpn lol
         /usr/sbin/route add $ifconfig_local gw $DEFGATEWAY
 
-        # connect the new network device with a dedicate routing table (must exist! see above!)
+        # connect the new network device with a dedicated routing table (must exist! see above!)
         /sbin/ip route add $ifconfig_local/32 dev $dev src $ifconfig_local table vpn$devnum
 
         # set a route in the global table that the vpn gateway is handled by the vpnX table
