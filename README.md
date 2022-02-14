@@ -269,6 +269,7 @@ SUCCESS: signal SIGTERM thrown
 Connection closed by foreign host.
 ```
 
+
 *Note: These signals can be sent by simple scripts to automate a reconnect or shutdown of openvpn. The output of the `vpnroutes` script may not be shown when you started `openvpn` on a different console. You can still see the messages in your syslog.*
 
 ## Additional status information
